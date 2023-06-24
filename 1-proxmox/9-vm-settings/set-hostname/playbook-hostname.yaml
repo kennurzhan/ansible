@@ -1,0 +1,38 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - [ "vars/vars.yml", "/dev/null"]
+
+  tasks:
+      #############################################################################################
+      ####################################### Set password ########################################
+
+      - name: debug message - Change password to root user
+        debug:
+          msg: qm guest exec "{{ vmID }}" -- usermod --password "{{ root_pasw }}" root
+
+      - name: Change password to root user
+        shell: qm guest exec "{{ vmID }}" -- usermod --password $(echo "{{ root_pasw }}" | openssl passwd -1 -stdin) root
+
+      - name: debug message - Change password to sadmin (sudo) user
+        debug:
+          msg: qm guest exec {{ vmID }} -- usermod --password "{{ sadmin_pasw }}" sadmin
+
+      - name: Change password to sadmin (sudo) user
+        shell: qm guest exec "{{ vmID }}" -- usermod --password $(echo "{{ sadmin_pasw }}" | openssl passwd -1 -stdin) sadmin
+
+
+      ############################################################################################
+      ####################################### Reboot VM ##########################################
+
+      - name: debug message - Reboot VM
+        debug:
+          msg: qm  reboot "{{ vmID }}"
+
+      - name: Reboot VM
+        shell: qm reboot "{{ vmID }}"
+
+
+      ############################################################################################
+      ############################################################################################

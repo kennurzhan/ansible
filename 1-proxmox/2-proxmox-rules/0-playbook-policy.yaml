@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  ### login.defs
+    - name: PASS_MAX_DAYS
+      lineinfile:
+        path: /etc/login.defs
+        regexp: 'PASS_MAX_DAYS(.*)$'
+        line: PASS_MAX_DAYS 90
+        backrefs: yes
+
+    - name: PASS_MIN_DAYS
+      lineinfile:
+        path: /etc/login.defs
+        regexp: 'PASS_MIN_DAYS(.*)$'
+        line: PASS_MIN_DAYS 0
+        backrefs: yes

@@ -1,0 +1,138 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - [ "vars/vars.yml", "/dev/null"]
+
+  tasks:
+      #############################################################################################
+      ####################################### SSH Reconfigure #####################################
+    - name: debug message
+      ansible.builtin.debug:
+        msg: qm guest exec "{{ vmID }}" -- dpkg-reconfigure --froce openssh-server
+
+    - name: Set network - ip
+      shell: |
+        qm guest exec "{{ vmID }}" -- dpkg-reconfigure --froce openssh-server
+
+
+      #############################################################################################
+      ######################################## Set IP Address #####################################
+    - name: debug message
+      ansible.builtin.debug:
+        msg: qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".addresses=[""{{ ip }}""]
+
+    - name: Set network - ip
+      shell: |
+        qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".addresses=[""{{ ip }}""] 
+
+
+      ########################################## Set Gateway4 #####################################
+    - name: debug message
+      ansible.builtin.debug:
+        msg: qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".gateway4=[""{{ gateway }}""]
+
+    - name: Set network - ip
+      shell: |
+        qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".gateway4=[""{{ gateway }}""] 
+
+
+      ######################################## Set Routes ##########################################
+
+    # - name: debug message - Set network - routes
+    #   ansible.builtin.debug:
+    #     msg: qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".routes='[{"to":"0.0.0.0/0", "via"':' ""{{ gateway }}""}]'
+
+    # - name: Set network - routes
+    #   shell: |
+    #     qm guest exec {{ vmID }} -- netplan set ethernets.{{ eth }}.routes='[{"to":"0.0.0.0/0", "via":"{{ gateway }}"}]'
+
+
+      ############################################ DHCP ###########################################
+
+    - name: debug message - Set network - dhcp - command
+      ansible.builtin.debug:
+        msg: qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".dhcp4=false 
+
+    - name: Set network - dhcp   
+      shell: |
+        qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".dhcp4=false 
+
+
+      ######################################  Set Nameservers #####################################
+
+    - name: debug message - Set network - nameservers - command
+      ansible.builtin.debug:
+        msg: qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".nameservers.addresses=["{{ nameserver }}"]
+
+    - name: Set network - nameservers
+      shell: |
+        qm guest exec "{{ vmID }}" -- netplan set ethernets."{{ eth }}".nameservers.addresses=["{{ nameserver }}"]
+
+
+      ####################################### Cat config file #####################################
+
+    # - name: Config file
+    #   shell: |
+    #     qm guest exec "{{ vmID }}" -- cat /etc/netplan/70-netplan-set.yaml
+    #   register: file_content
+
+      ####################################### Apply changes #######################################
+
+    - name: Netplan apply
+      shell: |
+        qm guest exec "{{ vmID }}" -- netplan apply
+    - name: debug message
+      ansible.builtin.debug:
+        msg: qm guest exec "{{ vmID }}" -- netplan apply
+
+      #############################################################################################
+      ####################################### Set hostname ##########№#############################
+
+    - name: Set hostname
+      shell: |
+        qm guest exec "{{ vmID }}" -- hostnamectl set-hostname "{{ hostname }}"
+    - name: debug message
+      debug:
+        msg: qm guest exec "{{ vmID }}" -- hostnamectl set-hostname "{{ hostname }}"
+
+
+    - name: Replace hostname
+      shell: |
+        qm guest exec "{{ vmID }}" -- sed -i 's/"{{ old_hostname }}"/"{{ hostname }}"/g' /etc/hosts
+    - name: debug message
+      debug:
+        msg: qm guest exec "{{ vmID }}" -- sed -i 's/"{{ old_hostname }}"/"{{ hostname }}"/g' /etc/hosts
+
+
+      #############################################################################################
+      ####################################### Set password ########################################
+
+#    - name: debug message - Change password to root user
+#      debug:
+#        msg: qm guest exec "{{ vmID }}" -- usermod --password "{{ root_pasw }}" root
+#
+#    - name: Change password to root user
+#      shell: qm guest exec "{{ vmID }}" -- usermod --password $(echo "{{ root_pasw }}" | openssl passwd -1 -stdin) root
+#
+#    - name: debug message - Change password to sadmin (sudo) user
+#      debug:
+#        msg: qm guest exec {{ vmID }} -- usermod --password "{{ sadmin_pasw }}" sadmin
+#
+#    - name: Change password to sadmin (sudo) user
+#      shell: qm guest exec "{{ vmID }}" -- usermod --password $(echo "{{ sadmin_pasw }}" | openssl passwd -1 -stdin) sadmin
+
+
+      #############################################################################################
+      ######################################## Reboot VM ##########################################
+
+    # - name: debug message - Reboot VM
+    #   debug:
+    #     msg: qm  reboot "{{ vmID }}"
+
+    # - name: Reboot VM
+    #   shell: qm reboot "{{ vmID }}"
+
+
+      #############################################################################################
+      #############################################################################################

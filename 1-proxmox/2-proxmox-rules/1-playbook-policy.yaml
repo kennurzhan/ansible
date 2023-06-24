@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: ClientAliveInterval 
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: 'ClientAliveInterval(.*)$'
+        line: ClientAliveInterval 300
+        backrefs: yes
+
+    - name: ClientAliveCountMax 
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: 'ClientAliveCountMax(.*)$'
+        line: ClientAliveCountMax 6
+        backrefs: yes
+
+    - name: TMOUT
+      lineinfile:
+        state: present
+        insertafter: BOF
+        dest: /etc/bash.bashrc
+        line: "{{ item }}"
+      with_items:
+      - TMOUT=1800
+      - readonly TMOUT
+      - export TMOUT

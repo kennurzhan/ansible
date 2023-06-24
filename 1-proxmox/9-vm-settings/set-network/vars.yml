@@ -1,0 +1,16 @@
+-
+  vmID: 120
+  hostname: ap.qosyl.kz
+  old_hostname: dev.qosyl.kz
+
+  #############################
+
+  eth: ens18
+  ip: 10.202.97.150/24
+  nameserver: 8.8.8.8
+  gateway: 10.202.97.1
+
+  #############################
+  
+  sadmin_pasw: bxizUm_u4_
+  root_pasw: E4+a8b%EH!
